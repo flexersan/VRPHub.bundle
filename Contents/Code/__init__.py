@@ -35,11 +35,12 @@ class VRPHub(Agent.Movies):
         if Prefs['debug']:
             Log(message, *args)
 
-    def getDateFromString(self, string):
-        try:
-            return Datetime.ParseDate(string).date()
-        except:
-            return None
+    def findDateInPage(self, html):
+        date = html.xpath('//time')[0].text_content();
+        self.Log('***** Date "%s"', date);
+        #result = re.search(r'(\d+-\d+-\d+)', title)
+        self.Log('***** Date "%s"', Datetime.ParseDate(date));
+        return Datetime.ParseDate(date)
 
     def getStringContentFromXPath(self, source, query):
         return source.xpath('string(' + query + ')')
@@ -106,11 +107,13 @@ class VRPHub(Agent.Movies):
 
             # Get the date
 #            date = self.findDateInTitle(media.title)
+            date = self.findDateInPage(html)
 
             # Set the date and year if found.
 #            if date is not None:
 #                metadata.originally_available_at = date
-            metadata.year = 2017
+            metadata.originally_available_at = date
+            metadata.year = date.year
 
             # Get the title
             metadata.title = self.getStringContentFromXPath(html, '//h1')
